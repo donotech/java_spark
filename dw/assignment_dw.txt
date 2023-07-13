@@ -1,0 +1,29 @@
+Store Meta file contains store_id, name and location
+Product Meta file contains item_id and product classifications
+sales_<store_id>.csv contains the sales for each store
+date - dimension has to be created
+
+ultimately the fact table would look like
+
+Fact:
+item_id,stored_id,date_id,item_qty,unit_price,total_amount,discounted_amount
+
+dimension tables:
+
+Product:
+item_id,product_name,product_type
+1,icecream,frozen food
+2,coke,beverage
+3,apple,fruit
+4,banana,fruit
+5,pepsi,beverage
+
+
+Store:
+store_id,store_name,store_city
+1,Retail Store One,Bengaluru
+2,Retail Store Two,Chennai
+3,Retail Store Three,Bengaluru
+
+Date:
+date_id,date,year,month
