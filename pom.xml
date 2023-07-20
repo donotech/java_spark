@@ -24,6 +24,8 @@
 <!--                    <target>17</target>-->
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>--add-exports java.base/sun.nio.ch=ALL-UNNAMED</compilerArgs>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

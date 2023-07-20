@@ -1,8 +1,8 @@
 package com.bdec.training.testing;
 
-import com.bdec.training.javasparkl2.DailyDiscountCalculator;
-import com.bdec.training.javasparkl2.ItemPrice;
-import com.bdec.training.javasparkl2.Sales;
+import com.bdec.training.spark.DailyDiscountCalculator;
+import com.bdec.training.spark.ItemPrice;
+import com.bdec.training.spark.Sales;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.spark.sql.SparkSession;
 
