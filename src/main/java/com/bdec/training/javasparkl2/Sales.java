@@ -1,4 +1,4 @@
-package com.bdec.training.javasparkl2;
+package com.bdec.training.spark;
 
 import java.io.Serializable;
 import java.util.Objects;

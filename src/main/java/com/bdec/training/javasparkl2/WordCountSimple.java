@@ -1,4 +1,4 @@
-package com.bdec.training.javasparkl2;
+package com.bdec.training.spark;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;

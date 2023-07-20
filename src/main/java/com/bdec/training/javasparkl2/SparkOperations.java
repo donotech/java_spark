@@ -10,6 +10,8 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.codehaus.jackson.map.ser.std.DateSerializer;
 
+import java.util.Locale;
+
 public class SparkOperations {
     static String productUrl = "file:///C:\\Training\\TVS\\dw\\product_meta.csv";
     static String salesUrl = "file:///C:\\Training\\TVS\\dw\\sales_1.csv";
@@ -93,10 +95,10 @@ public class SparkOperations {
 //                select(salesDf.col("item_id"), salesDf.col("item_qty"),
 //                        salesDf.col("total_amount"));
 
-        Dataset<Row> joinedDf = salesDf.join(productDf,
-                salesDf.col("item_id").equalTo(productDf.col("item_id")),
-                "left_outer");
-        joinedDf.explain();
+//        Dataset<Row> joinedDf = salesDf.join(productDf,
+//                salesDf.col("item_id").equalTo(productDf.col("item_id")),
+//                "left_outer");
+//        joinedDf.explain();
         try {
             Thread.sleep(100000);
         } catch (InterruptedException e) {
@@ -108,33 +110,42 @@ public class SparkOperations {
 ////
 //        groupedDf.show();
 //
-//        joinedDf.sqlContext().udf().register("WeekIdFromMonth",
-//                (UDF1<String, Integer>) dateddmmyyyy -> {
-//            String day = dateddmmyyyy.substring(0,2);
-//            Integer dayInt = Integer.parseInt(day);
-//            Integer weekId = 0;
-//            if(dayInt <= 6) {
-//                weekId = 1;
-//            } else if(dayInt <= 13) {
-//                weekId = 2;
-//            } else if(dayInt <= 21) {
-//                weekId = 3;
-//            } else if(dayInt <= 28) {
-//                weekId = 4;
-//            } else {
-//                weekId = 5;
-//            }
-//
-//            return weekId;
-//        }, DataTypes.IntegerType);
-//
-//        Dataset<Row> dsWithWeekId = joinedDf.selectExpr("*",
-//                "WeekIdFromMonth(cast(date_of_sale as string)) as WeekId");
-//        dsWithWeekId.show();
+
+        spark.sqlContext().udf().register("WeekIdFromMonth",
+                (UDF1<String, Integer>) dateddmmyyyy -> {
+            String day = dateddmmyyyy.substring(0,2);
+            Integer dayInt = Integer.parseInt(day);
+            Integer weekId = 0;
+            if(dayInt <= 6) {
+                weekId = 1;
+            } else if(dayInt <= 13) {
+                weekId = 2;
+            } else if(dayInt <= 21) {
+                weekId = 3;
+            } else if(dayInt <= 28) {
+                weekId = 4;
+            } else {
+                weekId = 5;
+            }
+
+            return weekId;
+        }, DataTypes.IntegerType);
+
+        Dataset<Row> dsWithWeekId = joinedDf.selectExpr("*",
+                "WeekIdFromMonth(cast(date_of_sale as string)) as WeekId");
+
+        dsWithWeekId.show();
 
     }
 
     public static void main(String[] args) {
+        String winUtilPath = "C:\\softwares\\winutils\\bin";
+        if(System.getProperty("os.name").toLowerCase().contains("win")) {
+            System.out.println("detected windows");
+            System.setProperty("hadoop.home.dir", winUtilPath);
+            System.setProperty("HADOOP_HOME", winUtilPath);
+        }
+
         SparkSession spark = SparkSession
                 .builder()
                 .appName("SocgenJava")

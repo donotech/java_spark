@@ -1,4 +1,4 @@
-package com.bdec.training.javasparkl2;
+package com.bdec.training.spark;
 
 import java.io.Serializable;
 
@@ -16,6 +16,10 @@ public class Person implements Serializable {
                 ", salary=" + salary +
                 ", designation='" + designation + '\'' +
                 '}';
+    }
+
+    public Boolean isAdult() {
+        return age > 18;
     }
 
     public Person() {

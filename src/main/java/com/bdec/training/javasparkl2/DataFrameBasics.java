@@ -1,4 +1,4 @@
-package com.bdec.training.javasparkl2;
+package com.bdec.training.spark;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -71,6 +71,8 @@ public class DataFrameBasics {
         });
         x.show();
 
+        Dataset<Person> adult = x.filter((FilterFunction<Person>) p -> p.isAdult());
+
     }
 
     public static void sqlVersion(SparkSession spark) throws AnalysisException {
@@ -90,8 +92,8 @@ public class DataFrameBasics {
                 .master("local[*]")
                 .getOrCreate();
 
-        //rddVersion(spark);
-        datasetVersion(spark);
+        rddVersion(spark);
+        //datasetVersion(spark);
 //        try {
 //           sqlVersion(spark);
 //        } catch (AnalysisException e) {
