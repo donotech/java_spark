@@ -5,41 +5,10 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.*;
-import scala.Function1;
-
-import java.util.Arrays;
 
 
-public class DataFrameBasics {
+public class DataFrameSimpleOps {
     static String url = "file:///C:\\Training\\sockgen_spark_java\\salary.csv";
-
-
-    public static void rddVersion(SparkSession spark) {
-        JavaSparkContext sparkContext = new JavaSparkContext(spark.sparkContext());
-        JavaRDD<String> lines = sparkContext.textFile(url)
-                .filter(line -> !line.startsWith("name")); //to remove header
-
-        JavaRDD<Person> people = lines.map(new Function<String, Person>() {
-            @Override
-            public Person call(String s) throws Exception {
-                String[] values = s.split(",");
-                String name = values[0];
-                Integer age = Integer.parseInt(values[1]);
-                Integer salary = Integer.parseInt(values[2]);
-                String designation = values[3];
-                Person p = new Person();
-                p.setAge(age);
-                p.setName(name);
-                p.setSalary(salary);
-                p.setDesignation(designation);
-                return p;
-            }
-        });
-
-        people.filter((Function<Person, Boolean>) person -> person.getAge() > 25)
-                .collect().forEach(System.out::println);
-
-    }
 
     public static void dataframeVersion(SparkSession spark) {
 
@@ -48,9 +17,16 @@ public class DataFrameBasics {
                 .option("inferSchema", "true")
                 .csv(url);
 
-        df.show();
-        df.printSchema();
-        df.filter("age > 25").select("name", "designation").show();
+//        df.show();
+//        df.printSchema();
+//        df.selectExpr("name", "age", "(salary/80) as dollar_salary").show();
+        Dataset<Row> dfGBP = df.withColumn("GBP_Salary", df.col("salary").divide(80))
+                .drop("age")
+                .withColumnRenamed("designation", "company_designation")
+                .dropDuplicates();
+
+        dfGBP.explain();
+        //df.filter("age > 25").select("name", "designation").show();
     }
 
     public static void datasetVersion(SparkSession spark) {
@@ -90,13 +66,12 @@ public class DataFrameBasics {
                 .master("local[*]")
                 .getOrCreate();
 
-//        rddVersion(spark);
-//        dataframeVersion(spark);
+        dataframeVersion(spark);
 //        datasetVersion(spark);
-        try {
-           sqlVersion(spark);
-        } catch (AnalysisException e) {
-            e.printStackTrace();
-        }
+//        try {
+//           sqlVersion(spark);
+//        } catch (AnalysisException e) {
+//            e.printStackTrace();
+//        }
     }
 }

@@ -40,15 +40,22 @@ public class SparkStructuredStreamWordCount {
         Dataset<Row> streamingFiles = spark.readStream().text("file:///C:\\tmp\\text_files");
         StreamingQuery query = null;
         try {
+//            Dataset<Row> words = streamingFiles.select(functions.explode(
+//                functions.split(streamingFiles.col("value"), " "))
+//                .alias("word"));
+//            Dataset<Row> wordCounts = words.groupBy("word").count();
+//            query = wordCounts.writeStream().outputMode("complete")
+//                .format("console").start();
+
             Dataset<Row> words = streamingFiles.select(functions.explode(
                             functions.split(streamingFiles.col("value"), " "))
-                    .alias("word"));
+                    .alias("word")); //.filter("word not in ['if', 'then', 'else']");
             query = words
                     .writeStream()
-                    .outputMode("append")
+                    .outputMode("complete")
                     .format("console")
                     .start();
-            query.awaitTermination(100000);
+            query.awaitTermination(1000000);
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (StreamingQueryException e) {

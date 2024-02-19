@@ -8,7 +8,7 @@ import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.codehaus.jackson.map.ser.std.DateSerializer;
+
 
 import java.util.Locale;
 
@@ -18,7 +18,7 @@ public class SparkOperations {
     static String sales2Url = "file:///C:\\Training\\TVS\\dw\\sales_2.csv";
 
     public static Dataset<Row> readSales(SparkSession spark, String filePath) {
-        //,,,,
+        //
         StructType schema = DataTypes.createStructType(new StructField[] {
                 DataTypes.createStructField("item_id",  DataTypes.IntegerType, true),
                 DataTypes.createStructField("item_qty", DataTypes.IntegerType, true),
@@ -64,12 +64,17 @@ public class SparkOperations {
         Dataset<Row> allSalesDf = salesDf.select("item_id", "item_qty", "unit_price", "total_amount", "date_of_sale")
                 .union(sales2Df.select("item_id", "item_qty", "unit_price", "total_amount", "date_of_sale"));
         allSalesDf.show();
-        Dataset<Row> joinedDf = salesDf.join(productDf,
+        Dataset<Row> joinedDf = productDf.join(salesDf,
                 salesDf.col("item_id").equalTo(productDf.col("item_id")),
-                "inner");
+                "left_outer").where(salesDf.col("item_id").isNotNull());
+        joinedDf.show();
+
+        Dataset<Row> semiJoinedDf = productDf.join(salesDf,
+                salesDf.col("item_id").equalTo(productDf.col("item_id")),
+                "left_semi");
+        semiJoinedDf.show();
 
         //with SQL
-
         salesDf.createOrReplaceTempView("sales");
         productDf.createOrReplaceTempView("product");
 
@@ -78,63 +83,64 @@ public class SparkOperations {
         //temp.explain();
         joinedDf.explain();
 
-//        Dataset<Row> missingProductsDf = productDf.join(salesDf,
-//                salesDf.col("item_id").equalTo(productDf.col("item_id")),
-//                "left_outer").filter(salesDf.col("item_id").isNull());
-//        Dataset<Row> missingProductsDf2 = spark.sql(
-//                "select product.* from product left outer join sales " +
-//                        "on product.item_id = sales.item_id where sales.item_id is null");
-//
-//        missingProductsDf2 = spark.sql(
-//                "select * from product left anti join sales " +
-//                        "on product.item_id = sales.item_id");
+        Dataset<Row> missingProductsDf = productDf.join(salesDf,
+                salesDf.col("item_id").equalTo(productDf.col("item_id")),
+                "left_outer").filter(salesDf.col("item_id").isNull());
+        Dataset<Row> missingProductsDf2 = spark.sql(
+                "select product.* from product left outer join sales " +
+                        "on product.item_id = sales.item_id where sales.item_id is null");
 
-//        Dataset<Row> joinedDf = salesDf.join(productDf,
-//                salesDf.col("item_id").equalTo(productDf.col("item_id")),
-//                "left").filter("product_name is not null").
-//                select(salesDf.col("item_id"), salesDf.col("item_qty"),
-//                        salesDf.col("total_amount"));
+        missingProductsDf2 = spark.sql(
+                "select * from product left anti join sales " +
+                        "on product.item_id = sales.item_id");
 
-//        Dataset<Row> joinedDf = salesDf.join(productDf,
-//                salesDf.col("item_id").equalTo(productDf.col("item_id")),
-//                "left_outer");
-//        joinedDf.explain();
+        Dataset<Row> joinedDf2 = salesDf.join(productDf,
+                salesDf.col("item_id").equalTo(productDf.col("item_id")),
+                "left").filter("product_name is not null").
+                select(salesDf.col("item_id"), salesDf.col("item_qty"),
+                        salesDf.col("total_amount"));
+
+        Dataset<Row> joinedDf3 = salesDf.join(productDf,
+                salesDf.col("item_id").equalTo(productDf.col("item_id")),
+                "left_outer"); //.hint("skew", "item_id");
+        joinedDf3.explain();
+
         try {
             Thread.sleep(100000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+//
 //        Dataset<Row> groupedDf = joinedDf.groupBy( "date_of_sale")
 //                .agg(functions.sum("total_amount").as("TotalAmount"));
 ////
 //        groupedDf.show();
 //
-
-        spark.sqlContext().udf().register("WeekIdFromMonth",
-                (UDF1<String, Integer>) dateddmmyyyy -> {
-            String day = dateddmmyyyy.substring(0,2);
-            Integer dayInt = Integer.parseInt(day);
-            Integer weekId = 0;
-            if(dayInt <= 6) {
-                weekId = 1;
-            } else if(dayInt <= 13) {
-                weekId = 2;
-            } else if(dayInt <= 21) {
-                weekId = 3;
-            } else if(dayInt <= 28) {
-                weekId = 4;
-            } else {
-                weekId = 5;
-            }
-
-            return weekId;
-        }, DataTypes.IntegerType);
-
-        Dataset<Row> dsWithWeekId = joinedDf.selectExpr("*",
-                "WeekIdFromMonth(cast(date_of_sale as string)) as WeekId");
-
-        dsWithWeekId.show();
+//
+//        spark.sqlContext().udf().register("WeekIdFromMonth",
+//                (UDF1<String, Integer>) dateddmmyyyy -> {
+//            String day = dateddmmyyyy.substring(0,2);
+//            Integer dayInt = Integer.parseInt(day);
+//            Integer weekId = 0;
+//            if(dayInt <= 6) {
+//                weekId = 1;
+//            } else if(dayInt <= 13) {
+//                weekId = 2;
+//            } else if(dayInt <= 21) {
+//                weekId = 3;
+//            } else if(dayInt <= 28) {
+//                weekId = 4;
+//            } else {
+//                weekId = 5;
+//            }
+//
+//            return weekId;
+//        }, DataTypes.IntegerType);
+//
+//        Dataset<Row> dsWithWeekId = joinedDf.selectExpr("*",
+//                "WeekIdFromMonth(cast(date_of_sale as string)) as WeekId");
+//
+//        dsWithWeekId.show();
 
     }
 

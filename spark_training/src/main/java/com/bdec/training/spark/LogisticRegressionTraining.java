@@ -74,7 +74,7 @@ public class LogisticRegressionTraining {
 
         Dataset<Row> requiredFields = rawDf.na().drop();
 
-        Dataset<Row> fieldsForTraining = requiredFields.selectExpr(
+            Dataset<Row> fieldsForTraining = requiredFields.selectExpr(
                 "cast(Pregnancies as double)", "cast(Glucose as double)",
                 "cast(BloodPressure as double)", "cast(SkinThickness as double)",
                         "cast(Insulin as double)",

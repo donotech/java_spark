@@ -19,6 +19,6 @@ public class DailyDiscountCalculator {
     }
 
     public static Dataset<Row> getStores(Dataset<Row> sales) {
-        return sales.selectExpr("distinct(storeId)");
+        return sales.select("storeId").distinct();
     }
 }
