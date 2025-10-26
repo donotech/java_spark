@@ -1,9 +1,6 @@
 package com.bdec.training.spark;
 
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.*;
 
 
