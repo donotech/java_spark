@@ -61,7 +61,7 @@ public class StreamsDemo {
         List<String> stringList = new ArrayList<String>();
 
         stringList.add("One flew over the cuckoo's nest");
-        stringList.add("To kill a muckingbird");
+        stringList.add("To kill a mockingbird");
         stringList.add("Gone with the wind");
 
         Stream<String> streamFlatMap = stringList.stream();

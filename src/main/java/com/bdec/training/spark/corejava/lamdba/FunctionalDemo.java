@@ -63,6 +63,7 @@ public class FunctionalDemo {
         Predicate<String> rudeChecker = ruleOfExlaim.or(ruleOfStars).or(ruleOfCaps);
         Boolean isRude = rudeChecker.test("Some String");
 
+
         Supplier<Double> supplier = () -> (Math.random());
         Consumer<Integer> consumer = (value) -> System.out.println(value);
         BinaryOperator<Integer> binaryOperator =

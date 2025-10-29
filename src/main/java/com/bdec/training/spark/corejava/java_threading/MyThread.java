@@ -49,15 +49,15 @@ public class MyThread extends Thread {
         myThread.start();
         System.out.println("Print im in main thread");
 //
-        Thread  namedThread = new Thread("My name is Thread") {
-            public void run(){
-                System.out.println("run by: " + getName());
-            }
-        };
-
-        namedThread.start();
+//        Thread  namedThread = new Thread("My name is Thread") {
+//            public void run(){
+//                System.out.println("run by: " + getName());
+//            }
+//        };
+//
+//        namedThread.start();
         try {
-            myThread.join(10l);
+            myThread.join(10L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

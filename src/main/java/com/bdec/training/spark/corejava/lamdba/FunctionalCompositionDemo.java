@@ -1,8 +1,11 @@
 package com.bdec.training.spark.corejava.lamdba;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FunctionalCompositionDemo {
     public static void composeDemo() {
@@ -32,11 +35,18 @@ public class FunctionalCompositionDemo {
         ////
         Function<Integer, Integer> multiply = (value) -> value * 2;
         Function<Integer, Integer> add      = (value) -> value + 3;
+        Function<Integer, Integer> square = (value) -> value * value;
+
+//        Function<Integer, Integer> multiplyThenAdd = multiply.andThen(add)
+//                .andThen((value) -> value * value);
 
         Function<Integer, Integer> multiplyThenAdd = multiply.andThen(add)
-                .andThen((value) -> value * value);
+                .andThen(square);
+
 
         Integer result2 = multiplyThenAdd.apply(3);
+//        List<Integer> list = new ArrayList<>(1,2,3,4);
+//        list.stream().map(multiplyThenAdd).collect(Collectors.toList());
         System.out.println(result2);
     }
 
